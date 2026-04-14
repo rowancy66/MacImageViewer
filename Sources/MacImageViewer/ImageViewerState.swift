@@ -9,6 +9,7 @@ final class ImageViewerState: ObservableObject {
     @Published private(set) var navigator = ImageFileNavigator()
     @Published private(set) var image: NSImage?
     @Published private(set) var errorMessage: String?
+    @Published private(set) var actionMessage: String?
     @Published var resetToken = UUID()
     @Published var scaleText = "适合窗口"
 
@@ -45,6 +46,15 @@ final class ImageViewerState: ObservableObject {
         loadCurrentImageAndResetView()
     }
 
+    func selectImage(_ url: URL) {
+        guard let index = navigator.files.firstIndex(where: { $0.standardizedFileURL == url.standardizedFileURL }) else {
+            return
+        }
+
+        navigator = ImageFileNavigator(files: navigator.files, currentIndex: index)
+        loadCurrentImageAndResetView()
+    }
+
     func previousImage() {
         navigator = navigator.previous()
         loadCurrentImageAndResetView()
@@ -73,6 +83,101 @@ final class ImageViewerState: ObservableObject {
         }
     }
 
+    func copyCurrentImageFile() {
+        guard let url = navigator.currentURL else {
+            showActionMessage("还没有可复制的图片")
+            return
+        }
+
+        NSPasteboard.general.clearContents()
+        if NSPasteboard.general.writeObjects([url as NSURL]) {
+            showActionMessage("已复制图片文件")
+        } else {
+            showActionMessage("复制图片文件失败")
+        }
+    }
+
+    func pasteImageFileIntoCurrentFolder() {
+        guard let folderURL = currentFolderURL else {
+            showActionMessage("请先打开一张图片，再粘贴")
+            return
+        }
+
+        let pasteboard = NSPasteboard.general
+        let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] ?? []
+        let imageURLs = urls.filter(ImageFileNavigator.isSupportedImage)
+
+        guard let sourceURL = imageURLs.first else {
+            showActionMessage("剪贴板里没有可粘贴的图片文件")
+            return
+        }
+
+        let destinationURL = uniqueDestinationURL(
+            for: sourceURL.lastPathComponent,
+            in: folderURL
+        )
+
+        do {
+            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+            navigator = ImageFileNavigator.navigator(opening: destinationURL)
+            loadCurrentImageAndResetView()
+            showActionMessage("已粘贴图片")
+        } catch {
+            showActionMessage("粘贴失败：\(error.localizedDescription)")
+        }
+    }
+
+    func copyCurrentImagePath() {
+        guard let url = navigator.currentURL else {
+            showActionMessage("还没有可复制路径的图片")
+            return
+        }
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url.path, forType: .string)
+        showActionMessage("已复制文件路径")
+    }
+
+    func revealCurrentImageInFinder() {
+        guard let url = navigator.currentURL else {
+            showActionMessage("还没有可显示的图片")
+            return
+        }
+
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+        showActionMessage("已在 Finder 中显示")
+    }
+
+    func deleteCurrentImageToTrash() {
+        guard let url = navigator.currentURL, let currentIndex = navigator.currentIndex else {
+            showActionMessage("还没有可删除的图片")
+            return
+        }
+
+        let oldCount = navigator.files.count
+        do {
+            try FileManager.default.trashItem(at: url, resultingItemURL: nil)
+            let remainingFiles = navigator.files.filter { $0.standardizedFileURL != url.standardizedFileURL }
+            let nextIndex = ImageFileNavigator.indexAfterDeletingCurrent(
+                count: oldCount,
+                deletedIndex: currentIndex
+            )
+            navigator = ImageFileNavigator(files: remainingFiles, currentIndex: nextIndex)
+
+            if navigator.currentURL == nil {
+                image = nil
+                errorMessage = "当前文件夹里没有可显示的图片"
+                fitToWindow()
+            } else {
+                loadCurrentImageAndResetView()
+            }
+
+            showActionMessage("已移到废纸篓")
+        } catch {
+            showActionMessage("删除失败：\(error.localizedDescription)")
+        }
+    }
+
     private func loadCurrentImageAndResetView() {
         guard let url = navigator.currentURL else {
             image = nil
@@ -89,6 +194,36 @@ final class ImageViewerState: ObservableObject {
         image = loadedImage
         errorMessage = nil
         fitToWindow()
+    }
+
+    private var currentFolderURL: URL? {
+        navigator.currentURL?.deletingLastPathComponent()
+    }
+
+    private func uniqueDestinationURL(for fileName: String, in folderURL: URL) -> URL {
+        let originalURL = folderURL.appendingPathComponent(fileName)
+        guard FileManager.default.fileExists(atPath: originalURL.path) else {
+            return originalURL
+        }
+
+        let baseName = originalURL.deletingPathExtension().lastPathComponent
+        let pathExtension = originalURL.pathExtension
+        var counter = 1
+
+        while true {
+            let candidateName = pathExtension.isEmpty
+                ? "\(baseName) copy \(counter)"
+                : "\(baseName) copy \(counter).\(pathExtension)"
+            let candidateURL = folderURL.appendingPathComponent(candidateName)
+            if !FileManager.default.fileExists(atPath: candidateURL.path) {
+                return candidateURL
+            }
+            counter += 1
+        }
+    }
+
+    private func showActionMessage(_ message: String) {
+        actionMessage = message
     }
 }
 

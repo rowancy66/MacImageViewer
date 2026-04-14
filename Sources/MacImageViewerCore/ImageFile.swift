@@ -60,6 +60,12 @@ public struct ImageFileNavigator {
         return ImageFileNavigator(files: [selectedURL], currentIndex: 0)
     }
 
+    public static func indexAfterDeletingCurrent(count: Int, deletedIndex: Int) -> Int? {
+        let remainingCount = count - 1
+        guard remainingCount > 0 else { return nil }
+        return min(max(deletedIndex, 0), remainingCount - 1)
+    }
+
     public func previous() -> ImageFileNavigator {
         guard let currentIndex, !files.isEmpty else { return self }
         let nextIndex = currentIndex == 0 ? files.count - 1 : currentIndex - 1

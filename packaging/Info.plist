@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>zh_CN</string>
+  <key>CFBundleDisplayName</key>
+  <string>MacImageViewer</string>
+  <key>CFBundleExecutable</key>
+  <string>MacImageViewer</string>
+  <key>CFBundleIdentifier</key>
+  <string>dev.rowancy66.MacImageViewer</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>MacImageViewer</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.2.0</string>
+  <key>CFBundleVersion</key>
+  <string>2</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>13.0</string>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>CFBundleDocumentTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeName</key>
+      <string>Image Files</string>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>LSHandlerRank</key>
+      <string>Alternate</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>public.jpeg</string>
+        <string>public.png</string>
+        <string>com.compuserve.gif</string>
+        <string>public.tiff</string>
+        <string>com.microsoft.bmp</string>
+        <string>public.heic</string>
+        <string>org.webmproject.webp</string>
+      </array>
+    </dict>
+  </array>
+</dict>
+</plist>

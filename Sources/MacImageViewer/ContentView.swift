@@ -9,18 +9,10 @@ struct ContentView: View {
             toolbar
             Divider()
 
-            ZStack {
-                if let image = state.image {
-                    ImageCanvasView(
-                        image: image,
-                        resetToken: state.resetToken,
-                        onPrevious: state.previousImage,
-                        onNext: state.nextImage,
-                        onScaleChanged: state.updateScale
-                    )
-                } else {
-                    emptyView
-                }
+            HStack(spacing: 0) {
+                thumbnailSidebar
+                Divider()
+                imageArea
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(nsColor: .windowBackgroundColor))
@@ -29,6 +21,52 @@ struct ContentView: View {
             statusBar
         }
         .frame(minWidth: 720, minHeight: 480)
+    }
+
+    private var thumbnailSidebar: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("缩略图")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 10)
+                .padding(.top, 10)
+
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(state.navigator.files, id: \.self) { url in
+                        ThumbnailRow(
+                            url: url,
+                            isSelected: state.navigator.currentURL?.standardizedFileURL == url.standardizedFileURL
+                        ) {
+                            state.selectImage(url)
+                        }
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.bottom, 10)
+            }
+        }
+        .frame(width: 150)
+        .background(Color(nsColor: .controlBackgroundColor))
+    }
+
+    private var imageArea: some View {
+        ZStack {
+            if let image = state.image {
+                ImageCanvasView(
+                    image: image,
+                    resetToken: state.resetToken,
+                    onPrevious: state.previousImage,
+                    onNext: state.nextImage,
+                    onScaleChanged: state.updateScale
+                )
+                .contextMenu {
+                    imageContextMenu
+                }
+            } else {
+                emptyView
+            }
+        }
     }
 
     private var toolbar: some View {
@@ -69,6 +107,13 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
                 .frame(minWidth: 72, alignment: .leading)
 
+            if let actionMessage = state.actionMessage {
+                Text(actionMessage)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
             Spacer()
         }
         .padding(.horizontal, 14)
@@ -102,5 +147,77 @@ struct ContentView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
+    }
+
+    @ViewBuilder
+    private var imageContextMenu: some View {
+        Button("复制图片文件") {
+            state.copyCurrentImageFile()
+        }
+
+        Button("粘贴图片到当前文件夹") {
+            state.pasteImageFileIntoCurrentFolder()
+        }
+
+        Divider()
+
+        Button("复制文件路径") {
+            state.copyCurrentImagePath()
+        }
+
+        Button("在 Finder 中显示") {
+            state.revealCurrentImageInFinder()
+        }
+
+        Divider()
+
+        Button("移到废纸篓") {
+            state.deleteCurrentImageToTrash()
+        }
+    }
+}
+
+private struct ThumbnailRow: View {
+    let url: URL
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            VStack(spacing: 5) {
+                ThumbnailImage(url: url)
+                    .frame(width: 112, height: 82)
+                    .background(Color(nsColor: .windowBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                Text(url.lastPathComponent)
+                    .font(.system(size: 11))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(isSelected ? .white : .primary)
+            }
+            .padding(7)
+            .frame(maxWidth: .infinity)
+            .background(isSelected ? Color.accentColor : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ThumbnailImage: View {
+    let url: URL
+
+    var body: some View {
+        if let image = NSImage(contentsOf: url) {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .padding(3)
+        } else {
+            Text("无法预览")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+        }
     }
 }

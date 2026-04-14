@@ -55,10 +55,26 @@ func checkNextAndPreviousWrapAroundAtEdges() throws {
     try expect(last.next().currentURL?.lastPathComponent == "1.png", "最后一张的下一张应循环到第一张")
 }
 
+func checkIndexAfterDeletingCurrentImage() throws {
+    try expect(
+        ImageFileNavigator.indexAfterDeletingCurrent(count: 3, deletedIndex: 1) == 1,
+        "删除中间图片后，应选择原位置的下一张"
+    )
+    try expect(
+        ImageFileNavigator.indexAfterDeletingCurrent(count: 3, deletedIndex: 2) == 1,
+        "删除最后一张后，应选择新的最后一张"
+    )
+    try expect(
+        ImageFileNavigator.indexAfterDeletingCurrent(count: 1, deletedIndex: 0) == nil,
+        "删除唯一图片后，应没有当前图片"
+    )
+}
+
 let checks: [(String, () throws -> Void)] = [
     ("支持的图片扩展名不区分大小写", checkSupportedImageExtensionsAreCaseInsensitive),
     ("扫描文件夹时只保留图片并按 Finder 风格排序", checkImageFilesFiltersAndSortsByFinderLikeNameOrder),
-    ("上一张和下一张在边界处循环", checkNextAndPreviousWrapAroundAtEdges)
+    ("上一张和下一张在边界处循环", checkNextAndPreviousWrapAroundAtEdges),
+    ("删除当前图片后选择合理的新索引", checkIndexAfterDeletingCurrentImage)
 ]
 
 do {
