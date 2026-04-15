@@ -36,6 +36,7 @@ dist/LiteViewer.dmg
 ```
 
 推荐使用 `dist/LiteViewer.dmg` 安装。
+打包脚本会自动清理旧的 `MacImageViewer.*` 残留产物，方便你一直只看 LiteViewer 的最终结果。
 
 ## 如何安装
 

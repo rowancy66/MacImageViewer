@@ -7,6 +7,8 @@ DIST_DIR="$ROOT_DIR/dist"
 APP_DIR="$DIST_DIR/$APP_NAME.app"
 DMG_ROOT_DIR="$DIST_DIR/dmg-root"
 DMG_PATH="$DIST_DIR/$APP_NAME.dmg"
+LEGACY_APP_DIR="$DIST_DIR/MacImageViewer.app"
+LEGACY_DMG_PATH="$DIST_DIR/MacImageViewer.dmg"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
@@ -15,7 +17,8 @@ cd "$ROOT_DIR"
 
 swift build -c release --product "$APP_NAME"
 
-rm -rf "$APP_DIR" "$DMG_ROOT_DIR"
+rm -rf "$APP_DIR" "$DMG_ROOT_DIR" "$LEGACY_APP_DIR"
+rm -f "$DMG_PATH" "$LEGACY_DMG_PATH"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 
 cp ".build/release/$APP_NAME" "$MACOS_DIR/$APP_NAME"
@@ -34,7 +37,6 @@ if command -v /System/Library/Frameworks/CoreServices.framework/Frameworks/Launc
     -f "$APP_DIR" >/dev/null 2>&1 || true
 fi
 
-rm -f "$DMG_PATH"
 mkdir -p "$DMG_ROOT_DIR"
 cp -R "$APP_DIR" "$DMG_ROOT_DIR/$APP_NAME.app"
 ln -s /Applications "$DMG_ROOT_DIR/Applications"
