@@ -36,9 +36,9 @@ bash scripts/build-app.sh
 ```text
 dist/LiteViewer.app
 dist/LiteViewer.dmg
-dist/release/LiteViewer-0.4.0.dmg
-dist/release/LiteViewer-0.4.0.app.zip
-dist/release/LiteViewer-0.4.0-checksums.txt
+dist/release/LiteViewer-0.6.0.dmg
+dist/release/LiteViewer-0.6.0.app.zip
+dist/release/LiteViewer-0.6.0-checksums.txt
 ```
 
 推荐使用 `dist/LiteViewer.dmg` 安装。
@@ -77,8 +77,8 @@ bash scripts/prepare-release.sh
 3. 打 tag，例如：
 
 ```bash
-git tag v0.4.0
-git push origin v0.4.0
+git tag v0.6.0
+git push origin v0.6.0
 ```
 
 4. 等 GitHub Actions 自动生成 Release。
