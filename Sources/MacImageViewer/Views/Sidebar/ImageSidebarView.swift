@@ -11,6 +11,17 @@ struct ImageSidebarView: View {
             if state.sidebarItems.isEmpty {
                 sidebarEmptyState
             } else {
+                HStack {
+                    Text("当前图库")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(ViewerTheme.sidebarRowSecondary)
+                        .textCase(.uppercase)
+                    Spacer()
+                }
+                .padding(.horizontal, 18)
+                .padding(.top, 4)
+                .padding(.bottom, 6)
+
                 ScrollViewReader { proxy in
                     imageList
                         .onAppear {
@@ -36,19 +47,37 @@ struct ImageSidebarView: View {
 
     private var headerCard: some View {
         VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("轻巧浏览")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(ViewerTheme.sidebarAccent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(ViewerTheme.sidebarCardStrong)
+                    .clipShape(Capsule(style: .continuous))
+
+                Spacer()
+
+                Image(systemName: "circle.grid.2x2")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(ViewerTheme.sidebarWarmAccent)
+            }
+
             HStack(alignment: .center, spacing: 12) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    ViewerTheme.sidebarAccent,
-                                    Color(red: 0.35, green: 0.21, blue: 0.16)
+                                    ViewerTheme.sidebarWarmAccent,
+                                    ViewerTheme.sidebarAccent
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.22), lineWidth: 1)
                     Image(systemName: "photo.stack")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(.white)
@@ -92,7 +121,7 @@ struct ImageSidebarView: View {
                 .background(
                     LinearGradient(
                         colors: [
-                            ViewerTheme.sidebarSelectionGlow,
+                            ViewerTheme.sidebarWarmAccent,
                             ViewerTheme.sidebarAccent
                         ],
                         startPoint: .leading,
@@ -101,15 +130,30 @@ struct ImageSidebarView: View {
                 )
                 .clipShape(Capsule(style: .continuous))
             }
+
+            HStack(spacing: 8) {
+                headerMetric(symbol: "folder", text: state.currentFolderName)
+                headerMetric(symbol: "photo.on.rectangle", text: state.sidebarSummaryText)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(ViewerTheme.sidebarCard)
+        .background(
+            LinearGradient(
+                colors: [
+                    ViewerTheme.sidebarCardStrong,
+                    ViewerTheme.sidebarCard
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .stroke(ViewerTheme.sidebarBorder, lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
         .padding(.horizontal, 14)
         .padding(.top, 14)
         .padding(.bottom, 10)
@@ -139,15 +183,21 @@ struct ImageSidebarView: View {
 
     private var sidebarEmptyState: some View {
         VStack(spacing: 14) {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(ViewerTheme.sidebarCard)
-                .frame(width: 110, height: 110)
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(ViewerTheme.sidebarCardStrong)
+                .frame(width: 126, height: 126)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
+                        .foregroundStyle(ViewerTheme.sidebarAccent.opacity(0.35))
+                        .padding(10)
+                )
                 .overlay(
                     VStack(spacing: 8) {
-                        Image(systemName: "rectangle.stack.person.crop")
+                        Image(systemName: "photo.stack")
                             .font(.system(size: 28, weight: .light))
                             .foregroundStyle(ViewerTheme.sidebarAccent)
-                        Capsule().fill(Color.black.opacity(0.12)).frame(width: 60, height: 6)
+                        Capsule().fill(Color.black.opacity(0.12)).frame(width: 66, height: 6)
                     }
                 )
 
@@ -163,6 +213,20 @@ struct ImageSidebarView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(20)
+    }
+
+    private func headerMetric(symbol: String, text: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: symbol)
+            Text(text)
+                .lineLimit(1)
+        }
+        .font(.system(size: 11, weight: .medium))
+        .foregroundStyle(ViewerTheme.sidebarRowSecondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(Color.white.opacity(0.62))
+        .clipShape(Capsule(style: .continuous))
     }
 
     private func scrollToSelection(with proxy: ScrollViewProxy, animated: Bool) {
@@ -269,15 +333,24 @@ private struct ImageSidebarRowView: View {
                 LinearGradient(
                     colors: [
                         ViewerTheme.sidebarHover,
-                        ViewerTheme.sidebarHover.opacity(0.78)
+                        Color.white.opacity(0.76)
                     ],
-                    startPoint: .top,
-                    endPoint: .bottom
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
                 )
             )
         }
 
-        return AnyShapeStyle(ViewerTheme.sidebarRow)
+        return AnyShapeStyle(
+            LinearGradient(
+                colors: [
+                    ViewerTheme.sidebarRow,
+                    Color.white.opacity(0.52)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
     }
 
     private var borderColor: Color {
@@ -293,7 +366,7 @@ private struct ImageSidebarRowView: View {
             return .black.opacity(0.20)
         }
 
-        return isHovered ? .black.opacity(0.08) : .clear
+        return isHovered ? .black.opacity(0.10) : .clear
     }
 
     private var selectionIndicatorColor: Color {

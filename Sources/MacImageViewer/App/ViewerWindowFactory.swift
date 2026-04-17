@@ -16,9 +16,9 @@ enum ViewerWindowFactory {
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true
         window.backgroundColor = NSColor(
-            calibratedRed: 0.92,
-            green: 0.93,
-            blue: 0.91,
+            calibratedRed: 0.95,
+            green: 0.94,
+            blue: 0.90,
             alpha: 1
         )
         window.toolbarStyle = .unified

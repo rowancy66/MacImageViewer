@@ -11,6 +11,14 @@ struct EmptyStateView: View {
             artwork
 
             VStack(alignment: .leading, spacing: 18) {
+                Text("欢迎来到 LiteViewer")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(ViewerTheme.sidebarAccent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.76))
+                    .clipShape(Capsule(style: .continuous))
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text(title)
                         .font(.system(size: 32, weight: .bold))
@@ -28,6 +36,14 @@ struct EmptyStateView: View {
                     }
                     .buttonStyle(ViewerCapsuleButtonStyle(highlighted: true))
 
+                    Label("像原生 Mac 工具一样轻快", systemImage: "sparkles")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(ViewerTheme.detailTextMuted)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(ViewerTheme.detailPanelStrong)
+                        .clipShape(Capsule(style: .continuous))
+
                     Label("左右切换", systemImage: "arrow.left.arrow.right")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(ViewerTheme.detailTextMuted)
@@ -37,7 +53,7 @@ struct EmptyStateView: View {
                         .clipShape(Capsule(style: .continuous))
                 }
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     featureRow(symbol: "sidebar.left", title: "侧边浏览", detail: "缩略图和文件名一起看，定位更快。")
                     featureRow(symbol: "viewfinder", title: "沉浸看图", detail: "大图区域单独成面，视觉更聚焦。")
                     featureRow(symbol: "rotate.right", title: "轻操作", detail: "保留常用旋转和缩放，不把界面做重。")
@@ -48,8 +64,8 @@ struct EmptyStateView: View {
         .background(
             LinearGradient(
                 colors: [
-                    Color.white.opacity(0.78),
-                    Color.white.opacity(0.54)
+                    Color.white.opacity(0.82),
+                    Color(red: 0.96, green: 0.95, blue: 0.92).opacity(0.68)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -60,21 +76,32 @@ struct EmptyStateView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(ViewerTheme.detailBorder, lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
         .frame(maxWidth: 760)
     }
 
     private var artwork: some View {
         ZStack {
+            Circle()
+                .fill(ViewerTheme.detailHeroGlow)
+                .frame(width: 210, height: 210)
+                .blur(radius: 20)
+                .offset(x: -30, y: -40)
+
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.96, green: 0.72, blue: 0.38),
-                            Color(red: 0.48, green: 0.63, blue: 0.72)
+                            Color(red: 0.99, green: 0.83, blue: 0.62),
+                            Color(red: 0.53, green: 0.68, blue: 0.74)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
                 )
 
             VStack(spacing: 10) {
@@ -95,6 +122,26 @@ struct EmptyStateView: View {
                     )
                     .rotationEffect(.degrees(-8))
                     .shadow(color: .black.opacity(0.18), radius: 10, x: 0, y: 8)
+
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.white.opacity(0.88))
+                    .frame(width: 124, height: 76)
+                    .overlay(
+                        VStack(spacing: 8) {
+                            Capsule().fill(Color.black.opacity(0.16)).frame(width: 60, height: 6)
+                            HStack(spacing: 6) {
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(Color(red: 0.95, green: 0.78, blue: 0.58))
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(Color(red: 0.64, green: 0.76, blue: 0.79))
+                            }
+                            .frame(height: 28)
+                            .padding(.horizontal, 10)
+                        }
+                    )
+                    .rotationEffect(.degrees(8))
+                    .offset(x: 44, y: -18)
+                    .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 8)
 
                 HStack(spacing: 8) {
                     Capsule().fill(Color.white.opacity(0.72)).frame(width: 38, height: 6)
@@ -127,5 +174,9 @@ struct EmptyStateView: View {
                     .foregroundStyle(ViewerTheme.detailTextSoft)
             }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Color.white.opacity(0.42))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }

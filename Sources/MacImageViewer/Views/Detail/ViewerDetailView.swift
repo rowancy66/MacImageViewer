@@ -28,6 +28,13 @@ struct ViewerDetailView: View {
     private var content: some View {
         ZStack {
             ViewerBackgroundView()
+
+            Circle()
+                .fill(ViewerTheme.detailHeroGlow)
+                .frame(width: 420, height: 420)
+                .blur(radius: 24)
+                .offset(x: 260, y: -180)
+
             LinearGradient(
                 colors: [
                     ViewerTheme.detailCanvasTop,
@@ -38,15 +45,18 @@ struct ViewerDetailView: View {
             )
 
             if let image = state.image {
-                ImageCanvasView(
-                    image: image,
-                    resetToken: state.resetToken,
-                    onPrevious: state.previousImage,
-                    onNext: state.nextImage,
-                    onScaleChanged: state.updateScale
-                )
-                .contextMenu {
-                    imageContextMenu
+                ViewerPanel {
+                    ImageCanvasView(
+                        image: image,
+                        resetToken: state.resetToken,
+                        onPrevious: state.previousImage,
+                        onNext: state.nextImage,
+                        onScaleChanged: state.updateScale
+                    )
+                    .contextMenu {
+                        imageContextMenu
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                 }
                 .padding(22)
             } else {

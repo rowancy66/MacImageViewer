@@ -33,16 +33,20 @@ struct SidebarThumbnailView: View {
                 }
             }
         }
-        .frame(width: 52, height: 52)
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .frame(width: 54, height: 54)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.white.opacity(0.32))
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(
                     isSelected ? Color.white.opacity(0.48) : Color.black.opacity(0.10),
                     lineWidth: isSelected ? 1.2 : 1
                 )
         )
-        .shadow(color: isSelected ? Color.white.opacity(0.12) : Color.white.opacity(0.15), radius: 3, x: 0, y: 1)
+        .shadow(color: isSelected ? Color.white.opacity(0.12) : Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
         .onAppear(perform: loadThumbnail)
         .onChange(of: url) { _ in
             loadThumbnail()
